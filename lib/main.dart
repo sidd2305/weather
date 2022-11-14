@@ -1,99 +1,264 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-void main() => runApp(MyApp());
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:dynamic_weather_icons/dynamic_weather_icons.dart';
+
+void main() {
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // Application name
-      title: 'Flutter Stateful Clicker Counter',
-      theme: ThemeData(
-        // Application theme data, you can set the colors for the application as
-        // you want
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Clicker Counter Home Page'),
+      home: HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  final String title;
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: TextStyle(fontSize: 25),
-            ),
-          ],
+        backgroundColor: Color(0xffd47b7b),
+        appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: Color(0xffd2de23),
+          title: Text(
+            "Weather App",
+            style: TextStyle(fontStyle: FontStyle.normal, fontSize: 30),
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+                image: NetworkImage(
+                    "https://images.unsplash.com/photo-1592210454359-9043f067919b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8d2VhdGhlcnxlbnwwfHwwfHw%3D&w=1000&q=80"),
+                fit: BoxFit.cover),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              FutureBuilder(
+                  future: apicall(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Column(
+                        children: [
+                          SizedBox(height: 30),
+                          Text(
+                            '📍${snapshot.data['name'].toString()}',
+                            style: TextStyle(
+                              fontSize: 75,
+                              color: Color(0xff3d3d3d),
+                            ),
+                          ),
+                          SizedBox(height: 30),
+                          Text(
+                            snapshot.data['description'].toString(),
+                            style: TextStyle(
+                              fontSize: 25,
+                              color: Color(0xff6769d9),
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          Icon(
+                            WeatherIcon.getIcon('wi-owm-day-200'),
+                            color: Color(0xff2cb8db),
+                            size: 70.0,
+                          ),
+                          SizedBox(height: 30),
+                          Text(
+                            '${snapshot.data['temp'].toString()}°C',
+                            style: TextStyle(
+                              fontSize: 100,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(height: 25),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 100,
+                                height: 75,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.white, //color of border
+                                      width: 2, //width of border
+                                    ),
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Text(
+                                      'min',
+                                      style: TextStyle(
+                                        fontSize: 30,
+                                        color: Color(0xff2cb8db),
+                                      ),
+                                    ),
+                                    Text(
+                                      '${snapshot.data['temp_min'].toString()}°C',
+                                      style: TextStyle(
+                                        fontSize: 30,
+                                        color: Color(0xff695151),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 40),
+                              Container(
+                                width: 100,
+                                height: 75,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.white, //color of border
+                                      width: 4, //width of border
+                                    ),
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Text(
+                                      'max',
+                                      style: TextStyle(
+                                        fontSize: 30,
+                                        color: Color(0xffd9bfbf),
+                                      ),
+                                    ),
+                                    Text(
+                                      '${snapshot.data['temp_max'].toString()}°C',
+                                      style: TextStyle(
+                                        fontSize: 30,
+                                        color: Color(0xffdb648c),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 70),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 100,
+                                height: 75,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.white, //color of border
+                                      width: 2, //width of border
+                                    ),
+                                    borderRadius: BorderRadius.circular(5)),
+                              ),
+                              SizedBox(width: 10),
+                              Container(
+                                width: 100,
+                                height: 75,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.white, //color of border
+                                      width: 2, //width of border
+                                    ),
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                ),
+                              ),
+                              SizedBox(width: 40),
+                              Container(
+                                width: 100,
+                                height: 75,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color:
+                                          Color(0xffd76969), //color of border
+                                      width: 4, //width of border
+                                    ),
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                ),
+                              ),
+                              SizedBox(width: 40),
+                              Container(
+                                width: 100,
+                                height: 75,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color:
+                                          Color(0xffd76969), //color of border
+                                      width: 4, //width of border
+                                    ),
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'clouds',
+                                      style: TextStyle(
+                                        fontSize: 30,
+                                        color: Color(0xff9e9cba),
+                                      ),
+                                    ),
+                                    Text(
+                                      '${snapshot.data['all'].toString()}',
+                                      style: TextStyle(
+                                        fontSize: 30,
+                                        color: Color(0xff9e9cba),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    } else {
+                      return CircularProgressIndicator();
+                    }
+                  })
+            ],
+          ),
+        ));
   }
+}
+
+var icon;
+Future apicall() async {
+  final url = Uri.parse(
+      "https://api.openweathermap.org/data/2.5/weather?q=bangalore&appid=11542823490b7fbc3699f1079ca374e0&units=metric");
+  final response = await http.get(url);
+  print(response.body);
+  final json = jsonDecode(response.body);
+  print(json['weather'][0]['description']);
+  // return json['weather'][0]['description'];
+
+  final output = {
+    'description': json['weather'][0]['description'],
+    'temp': json['main']['temp'],
+    'temp_min': json['main']['temp_min'],
+    'temp_max': json['main']['temp_max'],
+    'all': json['clouds']['all'],
+    'icon': json['weather'][0]['icon'],
+    'name': json['name'],
+    'cod': json['cod'],
+  };
+  return output;
 }
