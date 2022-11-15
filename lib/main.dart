@@ -82,7 +82,7 @@ class _HomePageState extends State<HomePage> {
                             '${snapshot.data['temp'].toString()}°C',
                             style: TextStyle(
                               fontSize: 100,
-                              color: Colors.white,
+                              color: Color(0xffd90ab7),
                             ),
                           ),
                           SizedBox(height: 25),
@@ -94,7 +94,8 @@ class _HomePageState extends State<HomePage> {
                                 height: 75,
                                 decoration: BoxDecoration(
                                     border: Border.all(
-                                      color: Colors.white, //color of border
+                                      color:
+                                          Color(0xff15c81e), //color of border
                                       width: 2, //width of border
                                     ),
                                     borderRadius: BorderRadius.circular(5)),
@@ -113,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                                       '${snapshot.data['temp_min'].toString()}°C',
                                       style: TextStyle(
                                         fontSize: 30,
-                                        color: Color(0xff695151),
+                                        color: Color(0xff56e6f9),
                                       ),
                                     ),
                                   ],
@@ -137,14 +138,14 @@ class _HomePageState extends State<HomePage> {
                                       'max',
                                       style: TextStyle(
                                         fontSize: 30,
-                                        color: Color(0xffd9bfbf),
+                                        color: Color(0xff9f2121),
                                       ),
                                     ),
                                     Text(
                                       '${snapshot.data['temp_max'].toString()}°C',
                                       style: TextStyle(
                                         fontSize: 30,
-                                        color: Color(0xffdb648c),
+                                        color: Color(0xff7e1336),
                                       ),
                                     ),
                                   ],
@@ -187,7 +188,7 @@ class _HomePageState extends State<HomePage> {
                                 decoration: BoxDecoration(
                                     border: Border.all(
                                       color:
-                                          Color(0xffd76969), //color of border
+                                          Color(0xffece5e5), //color of border
                                       width: 4, //width of border
                                     ),
                                     borderRadius: BorderRadius.circular(5)),
@@ -213,14 +214,14 @@ class _HomePageState extends State<HomePage> {
                                       'clouds',
                                       style: TextStyle(
                                         fontSize: 30,
-                                        color: Color(0xff9e9cba),
+                                        color: Color(0xff726ade),
                                       ),
                                     ),
                                     Text(
                                       '${snapshot.data['all'].toString()}',
                                       style: TextStyle(
                                         fontSize: 30,
-                                        color: Color(0xff9e9cba),
+                                        color: Color(0xff1e13b9),
                                       ),
                                     ),
                                   ],
